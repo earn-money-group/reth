@@ -12,4 +12,4 @@
 ```
 
 # 交由metamask 执行
-`将100.txt 里面的hexdata 放到 metamask 中, 自己对自己转账并提交hexdata 数据`
+`将100.txt 里面的一段一段的 hexdata 放到 metamask 中, 自己对自己转账并提交hexdata 数据(一段提交一次)`
