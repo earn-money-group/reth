@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -17,24 +16,26 @@ import (
 
 var (
 	count            int
+	worker           int
 	currentChallenge = common.Hex2Bytes("7245544800000000000000000000000000000000000000000000000000000000")
-	strs_7777777     = "0x0077777777"
+	strs_7777777     = "0x000077777777"
 )
 
 func main() {
 	flag.IntVar(&count, "c", 0, "count")
+	flag.IntVar(&worker, "w", 64, "worker")
 	flag.Parse()
 	if count <= 0 {
 		flag.Usage()
 		os.Exit(0)
 	}
 
-	cpuNum := runtime.NumCPU() - 1
 	var strChan = make(chan string, 1)
-	for i := 0; i < cpuNum; i++ {
+	for i := 0; i < worker; i++ {
 		go func(sc chan<- string) {
+			var data []byte
 			for {
-				data := []byte(fmt.Sprintf(`data:application/json,{"p":"rerc-20","op":"mint","tick":"rETH","id":"%s","amt":"10000"}`, randHash()))
+				data = []byte(fmt.Sprintf(`data:application/json,{"p":"rerc-20","op":"mint","tick":"rETH","id":"%s","amt":"10000"}`, randHash()))
 				sc <- hexutil.Bytes(data).String()
 			}
 		}(strChan)
@@ -52,8 +53,9 @@ func main() {
 
 func randHash() string {
 	data := make([]byte, 32) // common.Hash的长度为32字节
+	var err error
 	for {
-		_, err := rand.Read(data)
+		_, err = rand.Read(data)
 		if err != nil {
 			log.Fatal("create rand hash", zap.Error(err))
 		}
