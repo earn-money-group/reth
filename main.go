@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -16,22 +17,23 @@ import (
 
 var (
 	count            int
-	worker           int
 	currentChallenge = common.Hex2Bytes("7245544800000000000000000000000000000000000000000000000000000000")
 	strs_7777777     = "0x000077777777"
 )
 
 func main() {
 	flag.IntVar(&count, "c", 0, "count")
-	flag.IntVar(&worker, "w", 64, "worker")
 	flag.Parse()
 	if count <= 0 {
 		flag.Usage()
 		os.Exit(0)
 	}
+	cpunum := runtime.NumCPU() - 1
+	runtime.GOMAXPROCS(cpunum)
+	runtime.LockOSThread()
 
 	var strChan = make(chan string, 1)
-	for i := 0; i < worker; i++ {
+	for i := 0; i < cpunum; i++ {
 		go func(sc chan<- string) {
 			var data []byte
 			for {
